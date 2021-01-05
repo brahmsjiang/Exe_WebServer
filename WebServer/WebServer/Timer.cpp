@@ -49,6 +49,7 @@ TimerManager::TimerManager() {}
 
 TimerManager::~TimerManager() {}
 
+//设置每个连接的超时
 void TimerManager::addTimer(std::shared_ptr<HttpData> SPHttpData, int timeout) {
   SPTimerNode new_node(new TimerNode(SPHttpData, timeout));
   timerNodeQueue.push(new_node);
@@ -72,8 +73,10 @@ void TimerManager::handleExpiredEvent() {
   // MutexLockGuard locker(lock);
   while (!timerNodeQueue.empty()) {
     SPTimerNode ptimer_now = timerNodeQueue.top();
+	//是否删除，是其他地方被调用的
     if (ptimer_now->isDeleted())
       timerNodeQueue.pop();
+	//是否超时
     else if (ptimer_now->isValid() == false)
       timerNodeQueue.pop();
     else

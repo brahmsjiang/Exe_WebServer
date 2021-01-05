@@ -46,6 +46,7 @@ class TimerManager {
 
  private:
   typedef std::shared_ptr<TimerNode> SPTimerNode;
+  //最小堆，expiredTime_小的TimerNode位于top位置
   std::priority_queue<SPTimerNode, std::deque<SPTimerNode>, TimerCmp>
       timerNodeQueue;
   // MutexLock lock;

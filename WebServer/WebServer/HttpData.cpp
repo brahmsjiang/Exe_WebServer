@@ -279,6 +279,7 @@ void HttpData::handleWrite() {
   }
 }
 
+//无论处理哪种类型event都会被调用
 void HttpData::handleConn() {
   seperateTimer();
   __uint32_t &events_ = channel_->getEvents();
