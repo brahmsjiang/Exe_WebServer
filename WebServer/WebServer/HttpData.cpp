@@ -337,7 +337,7 @@ URIState HttpData::parseURI() {
   if (pos < 0) {
     return PARSE_URI_AGAIN;
   }
-  // 去掉请求行所占的空间，节省空间
+  // 去掉请求行所占的空间，节省空间，并为后续解析header等准备
   string request_line = str.substr(0, pos);
   if (str.size() > pos + 1)
     str = str.substr(pos + 1);
