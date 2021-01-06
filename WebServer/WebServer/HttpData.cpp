@@ -340,7 +340,7 @@ URIState HttpData::parseURI() {
   // 去掉请求行所占的空间，节省空间，并为后续解析header等准备
   string request_line = str.substr(0, pos);
   if (str.size() > pos + 1)
-    str = str.substr(pos + 1);
+    str = str.substr(pos + 1);//pos + 2?
   else
     str.clear();
   // Method
@@ -417,7 +417,8 @@ HeaderState HttpData::parseHeaders() {
   for (; i < str.size() && notFinish; ++i) {
     switch (hState_) {
       case H_START: {
-        if (str[i] == '\n' || str[i] == '\r') break;
+        if (str[i] == '\n' || str[i] == '\r')
+			break;//break switch
         hState_ = H_KEY;
         key_start = i;
         now_read_line_begin = i;
@@ -428,14 +429,17 @@ HeaderState HttpData::parseHeaders() {
           key_end = i;
           if (key_end - key_start <= 0) return PARSE_HEADER_ERROR;
           hState_ = H_COLON;
-        } else if (str[i] == '\n' || str[i] == '\r')
+        }
+		else if (str[i] == '\n' || str[i] == '\r')
           return PARSE_HEADER_ERROR;
         break;
       }
       case H_COLON: {
+	  	//冒号后要有一个空格
         if (str[i] == ' ') {
           hState_ = H_SPACES_AFTER_COLON;
-        } else
+        }
+		else
           return PARSE_HEADER_ERROR;
         break;
       }
@@ -446,6 +450,7 @@ HeaderState HttpData::parseHeaders() {
       }
       case H_VALUE: {
         if (str[i] == '\r') {
+		  //cr回车 lf换行
           hState_ = H_CR;
           value_end = i;
           if (value_end - value_start <= 0) return PARSE_HEADER_ERROR;
@@ -460,7 +465,8 @@ HeaderState HttpData::parseHeaders() {
           string value(str.begin() + value_start, str.begin() + value_end);
           headers_[key] = value;
           now_read_line_begin = i;
-        } else
+        }
+		else
           return PARSE_HEADER_ERROR;
         break;
       }
