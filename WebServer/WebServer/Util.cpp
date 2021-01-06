@@ -41,16 +41,23 @@ ssize_t readn(int fd, std::string &inBuffer, bool &zero) {
   ssize_t readSum = 0;
   while (true) {
     char buff[MAX_BUFF];
+	//read的错误处理
     if ((nread = read(fd, buff, MAX_BUFF)) < 0) {
+	  //阻塞于慢系统调用时，捕获到信号且信号处理函数返回时。
+	  //处理方法除了connect必须重新使用select/epoll等等待连接，其他系统调用可以重启
       if (errno == EINTR)
         continue;
+	  //对于非阻塞socket而言，EAGAIN不是错误，提示再次尝试直到操作完成
       else if (errno == EAGAIN) {
         return readSum;
-      } else {
+      }
+	  else {
         perror("read error");
         return -1;
       }
-    } else if (nread == 0) {
+    }
+	//对端关闭连接，收到EOF（0表示到达文件末尾）；或真的读完了
+	else if (nread == 0) {
       // printf("redsum = %d\n", readSum);
       zero = true;
       break;

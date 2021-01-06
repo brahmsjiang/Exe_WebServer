@@ -77,6 +77,7 @@ class Channel {
     if (revents_ & EPOLLOUT) {
       handleWrite();
     }
+	//重置连接
     handleConn();
   }
   void handleRead();

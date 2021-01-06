@@ -156,6 +156,7 @@ void HttpData::handleRead() {
   __uint32_t &events_ = channel_->getEvents();
   do {
     bool zero = false;
+	//fd_可认为对端的fd
     int read_num = readn(fd_, inBuffer_, zero);
     LOG << "Request: " << inBuffer_;
     if (connectionState_ == H_DISCONNECTING) {
@@ -187,11 +188,13 @@ void HttpData::handleRead() {
       // cout << "readnum == 0" << endl;
     }
 
+	//STATE_PARSE_URI是HttpData下state_的初始状态
     if (state_ == STATE_PARSE_URI) {
       URIState flag = this->parseURI();
       if (flag == PARSE_URI_AGAIN)
         break;
       else if (flag == PARSE_URI_ERROR) {
+	  	//把一个描述性错误消息输出到stderr，后面自动接原本错误消息
         perror("2");
         LOG << "FD = " << fd_ << "," << inBuffer_ << "******";
         inBuffer_.clear();
@@ -262,7 +265,8 @@ void HttpData::handleRead() {
       //     this->reset();
       //     events_ |= EPOLLIN;
       // }
-    } else if (!error_ && connectionState_ != H_DISCONNECTED)
+    }
+	else if (!error_ && connectionState_ != H_DISCONNECTED)
       events_ |= EPOLLIN;
   }
 }
@@ -279,7 +283,7 @@ void HttpData::handleWrite() {
   }
 }
 
-//无论处理哪种类型event都会被调用
+//无论处理哪种类型event都会调handleConn
 void HttpData::handleConn() {
   seperateTimer();
   __uint32_t &events_ = channel_->getEvents();
@@ -295,12 +299,14 @@ void HttpData::handleConn() {
       events_ |= EPOLLET;
       loop_->updatePoller(channel_, timeout);
 
-    } else if (keepAlive_) {
+    }
+	else if (keepAlive_) {
       events_ |= (EPOLLIN | EPOLLET);
       // events_ |= (EPOLLIN | EPOLLET | EPOLLONESHOT);
       int timeout = DEFAULT_KEEP_ALIVE_TIME;
       loop_->updatePoller(channel_, timeout);
-    } else {
+    }
+	else {
       // cout << "close normally" << endl;
       // loop_->shutdown(channel_);
       // loop_->runInLoop(bind(&HttpData::handleClose, shared_from_this()));
@@ -309,10 +315,13 @@ void HttpData::handleConn() {
       int timeout = (DEFAULT_KEEP_ALIVE_TIME >> 1);
       loop_->updatePoller(channel_, timeout);
     }
-  } else if (!error_ && connectionState_ == H_DISCONNECTING &&
-             (events_ & EPOLLOUT)) {
+  } 
+  else if (!error_ && connectionState_ == H_DISCONNECTING && (events_ & EPOLLOUT)) 
+  {
     events_ = (EPOLLOUT | EPOLLET);
-  } else {
+  }
+  else 
+  {
     // cout << "close with errors" << endl;
     loop_->runInLoop(bind(&HttpData::handleClose, shared_from_this()));
   }
@@ -322,7 +331,9 @@ URIState HttpData::parseURI() {
   string &str = inBuffer_;
   string cop = str;
   // 读到完整的请求行再开始解析请求
+  // Search begins at nowReadPos_
   size_t pos = str.find('\r', nowReadPos_);
+  // 返回npos（-1）表示没找到
   if (pos < 0) {
     return PARSE_URI_AGAIN;
   }
@@ -356,11 +367,13 @@ URIState HttpData::parseURI() {
     fileName_ = "index.html";
     HTTPVersion_ = HTTP_11;
     return PARSE_URI_SUCCESS;
-  } else {
+  }
+  else {
     size_t _pos = request_line.find(' ', pos);
     if (_pos < 0)
       return PARSE_URI_ERROR;
     else {
+	  //指定文件
       if (_pos - pos > 1) {
         fileName_ = request_line.substr(pos + 1, _pos - pos - 1);
         size_t __pos = fileName_.find('?');
@@ -368,7 +381,7 @@ URIState HttpData::parseURI() {
           fileName_ = fileName_.substr(0, __pos);
         }
       }
-
+	  //未指定文件，对于"GET / HTTP/1.1\r\n...",pos指向'/',(_pos - pos) == 1
       else
         fileName_ = "index.html";
     }
