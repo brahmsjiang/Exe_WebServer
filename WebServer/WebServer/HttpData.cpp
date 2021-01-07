@@ -13,6 +13,8 @@
 using namespace std;
 
 pthread_once_t MimeType::once_control = PTHREAD_ONCE_INIT;
+//unordered_map内部实现用hashmap,其元素排列无序；而map内部用红黑树
+//按二叉搜索树存储，用中序遍历可从小到大输出
 std::unordered_map<std::string, std::string> MimeType::mime;
 
 const __uint32_t DEFAULT_EVENT = EPOLLIN | EPOLLET | EPOLLONESHOT;
@@ -102,6 +104,7 @@ void MimeType::init() {
 }
 
 std::string MimeType::getMime(const std::string &suffix) {
+  //linux下，使用初值为PTHREAD_ONCE_INIT的pthread_once_t变量保证init函数在本进程仅执行一次
   pthread_once(&once_control, MimeType::init);
   if (mime.find(suffix) == mime.end())
     return mime["default"];
@@ -224,6 +227,7 @@ void HttpData::handleRead() {
     if (state_ == STATE_RECV_BODY) {
       int content_length = -1;
       if (headers_.find("Content-length") != headers_.end()) {
+	  	//atoi: const char*-->int, stoi:const string*-->int
         content_length = stoi(headers_["Content-length"]);
       } else {
         // cout << "(state_ == STATE_RECV_BODY)" << endl;
@@ -528,7 +532,8 @@ AnalysisState HttpData::analysisRequest() {
     // outBuffer_ += header + string(data_encode.begin(), data_encode.end());
     // inBuffer_ = inBuffer_.substr(length);
     // return ANALYSIS_SUCCESS;
-  } else if (method_ == METHOD_GET || method_ == METHOD_HEAD) {
+  } 
+  else if (method_ == METHOD_GET || method_ == METHOD_HEAD) {
     string header;
     header += "HTTP/1.1 200 OK\r\n";
     if (headers_.find("Connection") != headers_.end() &&
@@ -554,6 +559,7 @@ AnalysisState HttpData::analysisRequest() {
     if (fileName_ == "favicon.ico") {
       header += "Content-Type: image/png\r\n";
       header += "Content-Length: " + to_string(sizeof favicon) + "\r\n";
+	  //首部字段Server告知当前服务器上安装的HTTP服务器应用程序信息
       header += "Server: LinYa's Web Server\r\n";
 
       header += "\r\n";
@@ -564,6 +570,7 @@ AnalysisState HttpData::analysisRequest() {
     }
 
     struct stat sbuf;
+	//通过filename获取文件信息，保存在结构体stat中
     if (stat(fileName_.c_str(), &sbuf) < 0) {
       header.clear();
       handleError(fd_, 404, "Not Found!");
@@ -575,7 +582,7 @@ AnalysisState HttpData::analysisRequest() {
     // 头部结束
     header += "\r\n";
     outBuffer_ += header;
-
+	//首部字段Head用于获取远程服务器上的文件信息
     if (method_ == METHOD_HEAD) return ANALYSIS_SUCCESS;
 
     int src_fd = open(fileName_.c_str(), O_RDONLY, 0);
@@ -584,6 +591,7 @@ AnalysisState HttpData::analysisRequest() {
       handleError(fd_, 404, "Not Found!");
       return ANALYSIS_ERROR;
     }
+	//mmap将一个内核中特定部分内存映射到进程的（用户）地址空间，无需像系统调用在内核和用户间拷贝
     void *mmapRet = mmap(NULL, sbuf.st_size, PROT_READ, MAP_PRIVATE, src_fd, 0);
     close(src_fd);
     if (mmapRet == (void *)-1) {
