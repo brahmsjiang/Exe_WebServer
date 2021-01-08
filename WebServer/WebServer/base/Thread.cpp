@@ -96,7 +96,9 @@ void Thread::start() {
   if (pthread_create(&pthreadId_, NULL, &startThread, data)) {
     started_ = false;
     delete data;
-  } else {
+  }
+  //pthread_create成功返回0
+  else {
     latch_.wait();
     assert(tid_ > 0);
   }
