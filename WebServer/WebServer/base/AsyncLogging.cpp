@@ -24,17 +24,18 @@ AsyncLogging::AsyncLogging(std::string logFileName_, int flushInterval)
   buffers_.reserve(16);
 }
 
+//发送方代码
 void AsyncLogging::append(const char* logline, int len) {
   MutexLockGuard lock(mutex_);
-  if (currentBuffer_->avail() > len)
+  if (currentBuffer_->avail() > len)//当前缓冲未满
     currentBuffer_->append(logline, len);
   else {
-    buffers_.push_back(currentBuffer_);
-    currentBuffer_.reset();
+    buffers_.push_back(currentBuffer_);//当前缓冲已满
+    currentBuffer_.reset();//reset替换被管理对象。也可提供删除器d，默认删除器为delete表达式
     if (nextBuffer_)
-      currentBuffer_ = std::move(nextBuffer_);
+      currentBuffer_ = std::move(nextBuffer_);//移动非复制
     else
-      currentBuffer_.reset(new Buffer);
+      currentBuffer_.reset(new Buffer);//写入速度太快，2个缓冲都用完
     currentBuffer_->append(logline, len);
     cond_.notify();
   }
@@ -44,6 +45,7 @@ void AsyncLogging::threadFunc() {
   assert(running_ == true);
   latch_.countDown();
   LogFile output(basename_);
+  //2个空闲buffer
   BufferPtr newBuffer1(new Buffer);
   BufferPtr newBuffer2(new Buffer);
   newBuffer1->bzero();
@@ -59,15 +61,15 @@ void AsyncLogging::threadFunc() {
       MutexLockGuard lock(mutex_);
       if (buffers_.empty())  // unusual usage!
       {
-        cond_.waitForSeconds(flushInterval_);
+        cond_.waitForSeconds(flushInterval_);//超时，或前端写满了一个/多个buffer
       }
-      buffers_.push_back(currentBuffer_);
+      buffers_.push_back(currentBuffer_);//当前缓冲移入buffers
       currentBuffer_.reset();
 
-      currentBuffer_ = std::move(newBuffer1);
-      buffersToWrite.swap(buffers_);
+      currentBuffer_ = std::move(newBuffer1);//空闲的newBuffer1移为当前缓冲
+      buffersToWrite.swap(buffers_);//buffers与buffersToWrite交换，临界区外安全访问buffersToWrite
       if (!nextBuffer_) {
-        nextBuffer_ = std::move(newBuffer2);
+        nextBuffer_ = std::move(newBuffer2);//空闲的newBuffer2移为nextBuffer_
       }
     }
 
