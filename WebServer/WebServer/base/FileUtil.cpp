@@ -32,8 +32,10 @@ void AppendFile::append(const char* logline, const size_t len) {
   }
 }
 
+//fflush()强迫将缓冲区内的数据写回参数stream指定的文件中
 void AppendFile::flush() { fflush(fp_); }
 
+//如果仅援引线程持有fd,在该线程调用fwrite_unlocked()是安全的
 size_t AppendFile::write(const char* logline, size_t len) {
   return fwrite_unlocked(logline, 1, len, fp_);
 }

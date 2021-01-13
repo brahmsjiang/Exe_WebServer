@@ -65,10 +65,11 @@ void AsyncLogging::threadFunc() {
       }
       buffers_.push_back(currentBuffer_);//当前缓冲移入buffers
       currentBuffer_.reset();
-
       currentBuffer_ = std::move(newBuffer1);//空闲的newBuffer1移为当前缓冲
+      
       buffersToWrite.swap(buffers_);//buffers与buffersToWrite交换，临界区外安全访问buffersToWrite
-      if (!nextBuffer_) {
+
+	  if (!nextBuffer_) {
         nextBuffer_ = std::move(newBuffer2);//空闲的newBuffer2移为nextBuffer_
       }
     }
@@ -91,6 +92,7 @@ void AsyncLogging::threadFunc() {
       output.append(buffersToWrite[i]->data(), buffersToWrite[i]->length());
     }
 
+	//reserve()只改capacity不改size,resize()既改capacity也改size。
     if (buffersToWrite.size() > 2) {
       // drop non-bzero-ed buffers, avoid trashing
       buffersToWrite.resize(2);
