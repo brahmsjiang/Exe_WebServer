@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
   // parse args
   int opt;
   const char *str = "t:l:p:";
+  //optarg指向当前选项参数（如果有）的指针
   while ((opt = getopt(argc, argv, str)) != -1) {
     switch (opt) {
       case 't': {
