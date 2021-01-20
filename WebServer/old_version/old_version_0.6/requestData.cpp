@@ -139,6 +139,7 @@ void RequestData::handleRead()
             perror("1");
             error = true;
             handleError(fd, 400, "Bad Request");
+            LOG << "handleError(fd, 400, "Bad Request");" << __LINE__ << __FUNCTION__ << "******";
             break;
         }
         else if (read_num == 0)

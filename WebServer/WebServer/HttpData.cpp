@@ -171,6 +171,7 @@ void HttpData::handleRead() {
       perror("1");
       error_ = true;
       handleError(fd_, 400, "Bad Request");
+      LOG << "perror(1)" << __FILE__ << __LINE__ << "*******"; 
       break;
     }
     // else if (read_num == 0)
@@ -203,6 +204,7 @@ void HttpData::handleRead() {
         inBuffer_.clear();
         error_ = true;
         handleError(fd_, 400, "Bad Request");
+        LOG << "perror(2)" << __FILE__ << __LINE__ << "*******"; 
         break;
       } else
         state_ = STATE_PARSE_HEADERS;
@@ -215,6 +217,7 @@ void HttpData::handleRead() {
         perror("3");
         error_ = true;
         handleError(fd_, 400, "Bad Request");
+        LOG << "perror(3)" << __FILE__ << __LINE__ << "*******"; 
         break;
       }
       if (method_ == METHOD_POST) {
@@ -362,6 +365,7 @@ URIState HttpData::parseURI() {
     pos = posHead;
     method_ = METHOD_HEAD;
   } else {
+    LOG << "no method found**********";
     return PARSE_URI_ERROR;
   }
 
@@ -375,7 +379,10 @@ URIState HttpData::parseURI() {
   else {
     size_t _pos = request_line.find(' ', pos);
     if (_pos < 0)
+    {
+      LOG << "cannot found ' '**********";
       return PARSE_URI_ERROR;
+    }
     else {
 	  //指定文件
       if (_pos - pos > 1) {
@@ -395,10 +402,16 @@ URIState HttpData::parseURI() {
   // HTTP 版本号
   pos = request_line.find("/", pos);
   if (pos < 0)
+  {
+    LOG << "cannot found '/'**********";
     return PARSE_URI_ERROR;
+  }
   else {
     if (request_line.size() - pos <= 3)
+    {
+      LOG << "request line invalid**********";
       return PARSE_URI_ERROR;
+    }
     else {
       string ver = request_line.substr(pos + 1, 3);
       if (ver == "1.0")
@@ -406,7 +419,10 @@ URIState HttpData::parseURI() {
       else if (ver == "1.1")
         HTTPVersion_ = HTTP_11;
       else
+      {
+        LOG << "HTTPVersion_ invalid**********";
         return PARSE_URI_ERROR;
+      }
     }
   }
   return PARSE_URI_SUCCESS;

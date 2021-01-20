@@ -12,7 +12,6 @@
 #include "Util.h"
 #include "base/Logging.h"
 
-
 #include <arpa/inet.h>
 #include <iostream>
 using namespace std;
@@ -82,6 +81,10 @@ std::vector<SP_Channel> Epoll::poll() {
   while (true) {
     int event_count =
         epoll_wait(epollFd_, &*events_.begin(), events_.size(), EPOLLWAIT_TIME);
+
+    if (0 == event_count)
+      cout << "epoll_wait return, timeout." << endl;
+
     if (event_count < 0) perror("epoll wait error");
     std::vector<SP_Channel> req_data = getEventsRequest(event_count);
     if (req_data.size() > 0) return req_data;

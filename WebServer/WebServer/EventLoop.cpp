@@ -94,12 +94,13 @@ void EventLoop::loop() {
   assert(isInLoopThread());
   looping_ = true;
   quit_ = false;
-  // LOG_TRACE << "EventLoop " << this << " start looping";
+  cout << "EventLoop " << this << " start looping";
   std::vector<SP_Channel> ret;
   while (!quit_) {
-    // cout << "doing" << endl;
+    cout << "doing, threadID:" << threadId_ << endl;
     ret.clear();
     ret = poller_->poll();
+
     eventHandling_ = true;
     for (auto& it : ret) it->handleEvents();
     eventHandling_ = false;

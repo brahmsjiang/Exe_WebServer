@@ -1,0 +1,1 @@
+./WebServer -t4 -l"/home/jianglan/Exe_WebServer/LOG.txt" -p8888
