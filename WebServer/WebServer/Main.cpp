@@ -5,7 +5,7 @@
 #include "EventLoop.h"
 #include "Server.h"
 #include "base/Logging.h"
-
+#include "base/CurrentThread.h"
 
 int main(int argc, char *argv[]) {
   int threadNum = 4;
@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
   EventLoop mainLoop;
   Server myHTTPServer(&mainLoop, threadNum, port);
   myHTTPServer.start();
+  LOG << "main(), threadID:" << CurrentThread::tid() << "\n";
   mainLoop.loop();
   return 0;
 }

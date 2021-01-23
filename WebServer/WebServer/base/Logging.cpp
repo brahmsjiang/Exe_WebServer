@@ -21,10 +21,16 @@ void once_init()
     AsyncLogger_->start(); 
 }
 
-void output(const char* msg, int len)
+void flushToFile(const char* msg, int len)
 {
     pthread_once(&once_control_, once_init);
     AsyncLogger_->append(msg, len);
+}
+
+void flushToStdout(const char* msg, int len)
+{
+    fwrite(msg, 1, len, stdout);
+
 }
 
 Logger::Impl::Impl(const char *fileName, int line)
@@ -55,5 +61,8 @@ Logger::~Logger()
 {
     impl_.stream_ << " -- " << impl_.basename_ << ':' << impl_.line_ << '\n';
     const LogStream::Buffer& buf(stream().buffer());
-    output(buf.data(), buf.length());
+    flushToFile(buf.data(), buf.length());
+
+    flushToStdout(buf.data(), buf.length());
+    
 }

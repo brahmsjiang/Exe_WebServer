@@ -94,10 +94,9 @@ void EventLoop::loop() {
   assert(isInLoopThread());
   looping_ = true;
   quit_ = false;
-  cout << "EventLoop " << this << " start looping";
+  LOG << "start looping, threadID:" << threadId_ << "\n";
   std::vector<SP_Channel> ret;
   while (!quit_) {
-    cout << "doing, threadID:" << threadId_ << endl;
     ret.clear();
     ret = poller_->poll();
 

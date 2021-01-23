@@ -51,11 +51,12 @@ int main(int argc, char *argv[]) {
 
   //just connect
     connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+
     while(1)
     {
       sleep(5);
     }
-    #if 0
+  #if 0
   // 发空串
   const char *p = " ";
   if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == 0) {
