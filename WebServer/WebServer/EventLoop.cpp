@@ -61,6 +61,11 @@ void EventLoop::wakeup() {
   if (n != sizeof one) {
     LOG << "EventLoop::wakeup() writes " << n << " bytes instead of 8";
   }
+  else
+  {
+    LOG << "EventLoop::wakeup() writes success\n";
+  }
+  
 }
 
 void EventLoop::handleRead() {
@@ -68,6 +73,10 @@ void EventLoop::handleRead() {
   ssize_t n = readn(wakeupFd_, &one, sizeof one);
   if (n != sizeof one) {
     LOG << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
+  }
+  else
+  {
+    LOG << "EventLoop::handleRead() reads success\n";
   }
   // pwakeupChannel_->setEvents(EPOLLIN | EPOLLET | EPOLLONESHOT);
   pwakeupChannel_->setEvents(EPOLLIN | EPOLLET);
@@ -86,7 +95,17 @@ void EventLoop::queueInLoop(Functor&& cb) {
     pendingFunctors_.emplace_back(std::move(cb));
   }
 
-  if (!isInLoopThread() || callingPendingFunctors_) wakeup();
+  bool bWakeUp = (!isInLoopThread() || callingPendingFunctors_);
+
+  char output[40], wakeinfo[10];
+  if (bWakeUp)
+  {
+      sprintf(wakeinfo, "wakeup-->%d", threadId_);
+      wakeup();
+  }
+
+  sprintf(output, "EventLoop::queueInLoop%s\n", wakeinfo);
+  LOG << output;
 }
 
 void EventLoop::loop() {
@@ -94,7 +113,7 @@ void EventLoop::loop() {
   assert(isInLoopThread());
   looping_ = true;
   quit_ = false;
-  LOG << "start looping, threadID:" << threadId_ << "\n";
+  LOG << "start looping\n";
   std::vector<SP_Channel> ret;
   while (!quit_) {
     ret.clear();

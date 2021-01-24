@@ -23,7 +23,7 @@ class Logger {
   class Impl {
    public:
     Impl(const char *fileName, int line);
-    void formatTime();
+    void formatPrefix();
 
     LogStream stream_;
     int line_;

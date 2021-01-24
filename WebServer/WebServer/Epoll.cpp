@@ -87,7 +87,7 @@ std::vector<SP_Channel> Epoll::poll() {
     std::vector<SP_Channel> req_data = getEventsRequest(event_count);
     if (req_data.size() > 0)
     {
-      cout << "epoll_wait return with req_data, threadID:" << CurrentThread::tid() << endl;
+      LOG << "epoll_wait return with req_data\n";
       return req_data;
     }
   }

@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
   EventLoop mainLoop;
   Server myHTTPServer(&mainLoop, threadNum, port);
   myHTTPServer.start();
-  LOG << "main(), threadID:" << CurrentThread::tid() << "\n";
+  LOG << "main()\n";
   mainLoop.loop();
   return 0;
 }
