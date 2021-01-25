@@ -62,10 +62,6 @@ void EventLoop::wakeup() {
   if (n != sizeof one) {
     LOG << "EventLoop::wakeup() writes " << n << " bytes instead of 8";
   }
-  else
-  {
-    LOG << "EventLoop::wakeup() writes success\n";
-  }
   
 }
 
@@ -75,10 +71,7 @@ void EventLoop::handleRead() {
   if (n != sizeof one) {
     LOG << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
   }
-  else
-  {
-    LOG << "EventLoop::handleRead() reads success\n";
-  }
+
   // pwakeupChannel_->setEvents(EPOLLIN | EPOLLET | EPOLLONESHOT);
   pwakeupChannel_->setEvents(EPOLLIN | EPOLLET);
 }

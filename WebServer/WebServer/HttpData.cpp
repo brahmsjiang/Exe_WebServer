@@ -134,7 +134,7 @@ void HttpData::reset() {
   // inBuffer_.clear();
   fileName_.clear();
   path_.clear();
-  nowReadPos_ = 0;
+  // nowReadPos_ = 0;connectionState_ = H_DISCONNECTING;
   state_ = STATE_PARSE_URI;
   hState_ = H_START;
   headers_.clear();
@@ -161,7 +161,7 @@ void HttpData::handleRead() {
     bool zero = false;
 	//fd_可认为对端的fd
     int read_num = readn(fd_, inBuffer_, zero);
-    LOG << "Request: " << inBuffer_ << "\n";
+    LOG << "Request: [" << inBuffer_ << "]\n";
     if (connectionState_ == H_DISCONNECTING) {
       inBuffer_.clear();
       break;
@@ -171,7 +171,7 @@ void HttpData::handleRead() {
       perror("1");
       error_ = true;
       handleError(fd_, 400, "Bad Request");
-      LOG << "perror(1)" << __FILE__ << __LINE__ << "\n";; 
+      LOG << "perror(1)" << __FILE__ << __LINE__ << "\n";
       break;
     }
     // else if (read_num == 0)
@@ -187,6 +187,7 @@ void HttpData::handleRead() {
       connectionState_ = H_DISCONNECTING;
       if (read_num == 0) {
         // error_ = true;
+        LOG << "no data read, endpoint closed possible\n";
         break;
       }
       // cout << "readnum == 0" << endl;
@@ -329,7 +330,7 @@ void HttpData::handleConn() {
   }
   else 
   {
-    // cout << "close with errors" << endl;
+    LOG << "handleClose, error_:" << error_ << "\n";
     loop_->runInLoop(bind(&HttpData::handleClose, shared_from_this()));
   }
 }

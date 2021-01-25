@@ -9,8 +9,9 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <iostream>
+#include <errno.h>
 
+#include <iostream>
 
 using namespace std;
 
@@ -30,6 +31,19 @@ using namespace std;
 // static void delete_event(int epollfd,int fd,int state);
 // static void modify_event(int epollfd,int fd,int state);
 
+void handleErr()
+{
+  if (errno == EINTR) {
+    cout << "EINTR, ignore\n";
+  }
+  else if (errno == EAGAIN) {
+    cout << "EAGAIN, try again\n";
+  } else {
+    cout << "others, read error\n";
+  }
+}
+
+
 int setSocketNonBlocking1(int fd) {
   int flag = fcntl(fd, F_GETFL, 0);
   if (flag == -1) return -1;
@@ -42,7 +56,6 @@ int setSocketNonBlocking1(int fd) {
 int main(int argc, char *argv[]) {
   int sockfd;
   struct sockaddr_in servaddr;
-  sockfd = socket(AF_INET, SOCK_STREAM, 0);
   bzero(&servaddr, sizeof(servaddr));
   servaddr.sin_family = AF_INET;
   servaddr.sin_port = htons(SERV_PORT);
@@ -51,13 +64,19 @@ int main(int argc, char *argv[]) {
   buff[0] = '\0';
 
   //just connect
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == 0) {
     setSocketNonBlocking1(sockfd);
+    cout << "#0" << endl;
     sleep(1);
+    ssize_t n = read(sockfd, buff, 4096);
+    cout << "n=" << n << endl;
+    handleErr();
+    printf("%s", buff);
     close(sockfd);
   }
   else {
-    perror("err1");
+    perror("err0");
   }
   sleep(4);
 
@@ -68,7 +87,7 @@ int main(int argc, char *argv[]) {
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == 0) {
     setSocketNonBlocking1(sockfd);
-    cout << "1:" << endl;
+    cout << "#1" << endl;
     ssize_t n = write(sockfd, p, strlen(p));
     cout << "strlen(p) = " << strlen(p) << endl;
     sleep(1);
@@ -87,7 +106,7 @@ int main(int argc, char *argv[]) {
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == 0) {
     setSocketNonBlocking1(sockfd);
-    cout << "2:" << endl;
+    cout << "#2" << endl;
     ssize_t n = write(sockfd, p, strlen(p));
     cout << "strlen(p) = " << strlen(p) << endl;
     sleep(1);
@@ -110,7 +129,7 @@ int main(int argc, char *argv[]) {
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == 0) {
     setSocketNonBlocking1(sockfd);
-    cout << "3:" << endl;
+    cout << "#3" << endl;
     ssize_t n = write(sockfd, p, strlen(p));
     cout << "strlen(p) = " << strlen(p) << endl;
     sleep(1);
