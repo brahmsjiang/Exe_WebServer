@@ -161,7 +161,7 @@ void HttpData::handleRead() {
     bool zero = false;
 	//fd_可认为对端的fd
     int read_num = readn(fd_, inBuffer_, zero);
-    LOG << "Request: " << inBuffer_;
+    LOG << "Request: " << inBuffer_ << "\n";
     if (connectionState_ == H_DISCONNECTING) {
       inBuffer_.clear();
       break;
@@ -171,7 +171,7 @@ void HttpData::handleRead() {
       perror("1");
       error_ = true;
       handleError(fd_, 400, "Bad Request");
-      LOG << "perror(1)" << __FILE__ << __LINE__ << "*******"; 
+      LOG << "perror(1)" << __FILE__ << __LINE__ << "\n";; 
       break;
     }
     // else if (read_num == 0)

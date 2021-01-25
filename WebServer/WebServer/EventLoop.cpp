@@ -12,6 +12,7 @@ using namespace std;
 __thread EventLoop* t_loopInThisThread = 0;
 
 int createEventfd() {
+  //eventfd有点像pipe，完成两个线程之间事件触发，现已经支持进程级别。能作为线程间简单通讯，类似于pthread_cond_t。
   int evtfd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
   if (evtfd < 0) {
     LOG << "Failed in eventfd";

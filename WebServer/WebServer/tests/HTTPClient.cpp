@@ -38,6 +38,7 @@ int setSocketNonBlocking1(int fd) {
   if (fcntl(fd, F_SETFL, flag) == -1) return -1;
   return 0;
 }
+
 int main(int argc, char *argv[]) {
   int sockfd;
   struct sockaddr_in servaddr;
@@ -50,15 +51,21 @@ int main(int argc, char *argv[]) {
   buff[0] = '\0';
 
   //just connect
-    connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+  if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == 0) {
+    setSocketNonBlocking1(sockfd);
+    sleep(1);
+    close(sockfd);
+  }
+  else {
+    perror("err1");
+  }
+  sleep(4);
 
-    while(1)
-    {
-      sleep(5);
-    }
-  #if 0
+
   // 发空串
   const char *p = " ";
+  //sockfd have to be re-initialized, becase it had been closed previsouly.
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) == 0) {
     setSocketNonBlocking1(sockfd);
     cout << "1:" << endl;
@@ -72,8 +79,9 @@ int main(int argc, char *argv[]) {
   } else {
     perror("err1");
   }
-  sleep(1);
+  sleep(4);
 
+#if 0
   // 发"GET  HTTP/1.1"
   p = "GET  HTTP/1.1";
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -90,7 +98,7 @@ int main(int argc, char *argv[]) {
   } else {
     perror("err2");
   }
-  sleep(1);
+  sleep(4);
 
   // 发
   // GET  HTTP/1.1
