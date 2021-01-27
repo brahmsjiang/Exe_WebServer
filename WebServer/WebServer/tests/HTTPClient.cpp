@@ -78,9 +78,9 @@ int main(int argc, char *argv[]) {
   else {
     perror("err0");
   }
+
   sleep(4);
 
-#if 0
   // 发空串
   const char *p = " ";
   //sockfd have to be re-initialized, becase it had been closed previsouly.
@@ -98,9 +98,14 @@ int main(int argc, char *argv[]) {
   } else {
     perror("err1");
   }
+
+  while (1)
+  {
   sleep(4);
+  }
+  
 
-
+#if 0
   // 发"GET  HTTP/1.1"
   p = "GET  HTTP/1.1";
   sockfd = socket(AF_INET, SOCK_STREAM, 0);

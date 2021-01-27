@@ -161,7 +161,7 @@ void HttpData::handleRead() {
     bool zero = false;
 	//fd_可认为对端的fd
     int read_num = readn(fd_, inBuffer_, zero);
-    LOG << "Request: [" << inBuffer_ << "]\n";
+    LOG << "Request[" << inBuffer_ << "]\n";
     if (connectionState_ == H_DISCONNECTING) {
       inBuffer_.clear();
       break;
@@ -201,11 +201,11 @@ void HttpData::handleRead() {
       else if (flag == PARSE_URI_ERROR) {
 	  	//把一个描述性错误消息输出到stderr，后面自动接原本错误消息
         perror("2");
-        LOG << "FD = " << fd_ << "," << inBuffer_ << "******";
+        LOG << "FD = " << fd_ << ", inBuffer[" << inBuffer_ << "]\n";
         inBuffer_.clear();
         error_ = true;
         handleError(fd_, 400, "Bad Request");
-        LOG << "perror(2)" << __FILE__ << __LINE__ << "*******"; 
+        LOG << "perror(2) " << __FILE__ << ":" <<__LINE__ << "\n"; 
         break;
       } else
         state_ = STATE_PARSE_HEADERS;
@@ -218,7 +218,7 @@ void HttpData::handleRead() {
         perror("3");
         error_ = true;
         handleError(fd_, 400, "Bad Request");
-        LOG << "perror(3)" << __FILE__ << __LINE__ << "*******"; 
+        LOG << "perror(3) " << __FILE__ << ":" << __LINE__ << "\n"; 
         break;
       }
       if (method_ == METHOD_POST) {
@@ -366,7 +366,7 @@ URIState HttpData::parseURI() {
     pos = posHead;
     method_ = METHOD_HEAD;
   } else {
-    LOG << "no method found**********";
+    LOG << "no method found.\n";
     return PARSE_URI_ERROR;
   }
 
@@ -381,7 +381,7 @@ URIState HttpData::parseURI() {
     size_t _pos = request_line.find(' ', pos);
     if (_pos < 0)
     {
-      LOG << "cannot found ' '**********";
+      LOG << "cannot found ' '.\n";
       return PARSE_URI_ERROR;
     }
     else {
@@ -404,13 +404,13 @@ URIState HttpData::parseURI() {
   pos = request_line.find("/", pos);
   if (pos < 0)
   {
-    LOG << "cannot found '/'**********";
+    LOG << "cannot found '/'\n";
     return PARSE_URI_ERROR;
   }
   else {
     if (request_line.size() - pos <= 3)
     {
-      LOG << "request line invalid**********";
+      LOG << "request line invalid.\n";
       return PARSE_URI_ERROR;
     }
     else {
@@ -421,7 +421,7 @@ URIState HttpData::parseURI() {
         HTTPVersion_ = HTTP_11;
       else
       {
-        LOG << "HTTPVersion_ invalid**********";
+        LOG << "HTTPVersion_ invalid.\n";
         return PARSE_URI_ERROR;
       }
     }
