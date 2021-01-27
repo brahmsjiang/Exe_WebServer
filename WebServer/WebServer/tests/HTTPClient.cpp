@@ -73,14 +73,14 @@ int main(int argc, char *argv[]) {
     cout << "n=" << n << endl;
     handleErr();
     printf("%s", buff);
-    close(sockfd);
+    //close(sockfd);
   }
   else {
     perror("err0");
   }
   sleep(4);
 
-
+#if 0
   // 发空串
   const char *p = " ";
   //sockfd have to be re-initialized, becase it had been closed previsouly.
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
   }
   sleep(4);
 
-#if 0
+
   // 发"GET  HTTP/1.1"
   p = "GET  HTTP/1.1";
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
