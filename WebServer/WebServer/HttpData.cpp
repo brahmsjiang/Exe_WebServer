@@ -199,13 +199,12 @@ void HttpData::handleRead() {
       if (flag == PARSE_URI_AGAIN)
         break;
       else if (flag == PARSE_URI_ERROR) {
-	  	//把一个描述性错误消息输出到stderr，后面自动接原本错误消息
+	  	//把上一个函数发生错误的原因输出到stderr，后面自动接原本错误消息
         perror("2");
         LOG << "FD = " << fd_ << ", inBuffer[" << inBuffer_ << "]\n";
         inBuffer_.clear();
         error_ = true;
         handleError(fd_, 400, "Bad Request");
-        LOG << "perror(2) " << __FILE__ << ":" <<__LINE__ << "\n"; 
         break;
       } else
         state_ = STATE_PARSE_HEADERS;
@@ -330,6 +329,7 @@ void HttpData::handleConn() {
   }
   else 
   {
+    // 一旦发现error_被设为true，服务端强制close
     LOG << "handleClose, error_:" << error_ << "\n";
     loop_->runInLoop(bind(&HttpData::handleClose, shared_from_this()));
   }
