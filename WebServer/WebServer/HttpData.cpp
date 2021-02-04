@@ -401,6 +401,7 @@ URIState HttpData::parseURI() {
   }
   // cout << "fileName_: " << fileName_ << endl;
   // HTTP 版本号
+  // string::find的第二个参数pos表示从pos为起始开始find
   pos = request_line.find("/", pos);
   if (pos < 0)
   {
@@ -408,6 +409,7 @@ URIState HttpData::parseURI() {
     return PARSE_URI_ERROR;
   }
   else {
+    // 对于"GET  HTTP/1.1"，size减去pos结果是4
     if (request_line.size() - pos <= 3)
     {
       LOG << "request line invalid.\n";
@@ -421,7 +423,7 @@ URIState HttpData::parseURI() {
         HTTPVersion_ = HTTP_11;
       else
       {
-        LOG << "HTTPVersion_ invalid.\n";
+        LOG << "HTTPVersion_ invalid, ver: " << ver << "\n";
         return PARSE_URI_ERROR;
       }
     }

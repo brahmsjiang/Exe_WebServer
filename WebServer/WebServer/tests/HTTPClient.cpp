@@ -99,13 +99,8 @@ int main(int argc, char *argv[]) {
     perror("err1");
   }
 
-  while (1)
-  {
   sleep(4);
-  }
-  
 
-#if 0
   // 发"GET  HTTP/1.1"
   p = "GET  HTTP/1.1";
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -122,6 +117,7 @@ int main(int argc, char *argv[]) {
   } else {
     perror("err2");
   }
+
   sleep(4);
 
   // 发
@@ -146,7 +142,10 @@ int main(int argc, char *argv[]) {
     perror("err3");
   }
 
-  #endif
+  while (1)
+  {
+  sleep(4);
+  }
   return 0;
 }
 
