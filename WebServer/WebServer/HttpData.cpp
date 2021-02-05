@@ -592,6 +592,7 @@ AnalysisState HttpData::analysisRequest() {
 	//通过filename获取文件信息，保存在结构体stat中
     if (stat(fileName_.c_str(), &sbuf) < 0) {
       header.clear();
+      LOG << "stat file failed, fileName:" << fileName_ << "\n";
       handleError(fd_, 404, "Not Found!");
       return ANALYSIS_ERROR;
     }
@@ -608,6 +609,7 @@ AnalysisState HttpData::analysisRequest() {
     if (src_fd < 0) {
       outBuffer_.clear();
       handleError(fd_, 404, "Not Found!");
+      LOG << "open file failed\n";
       return ANALYSIS_ERROR;
     }
 	//mmap将一个内核中特定部分内存映射到进程的（用户）地址空间，无需像系统调用在内核和用户间拷贝
@@ -617,6 +619,7 @@ AnalysisState HttpData::analysisRequest() {
       munmap(mmapRet, sbuf.st_size);
       outBuffer_.clear();
       handleError(fd_, 404, "Not Found!");
+      LOG << "mmap failed\n";
       return ANALYSIS_ERROR;
     }
     char *src_addr = static_cast<char *>(mmapRet);
