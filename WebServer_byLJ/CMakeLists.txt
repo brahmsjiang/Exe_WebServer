@@ -1,28 +1,54 @@
-cmake_minimum_required(VERSION 2.8)
-
-project(WebServer CXX)
+cmake_minimum_required(VERSION 3.0)
+set (CMAKE_CXX_STANDARD 11)
+project(WebServer_byLJ)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-set(CXX_FLAGS
-    -g
-    -Wall
-    -std=c++11
-    -D_PTHREADS
-    -Wno-unused-parameter
-)
+IF(CMAKE_PLATFORM STREQUAL "win64-vs14")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP")
+ELSEIF(CMAKE_PLATFORM STREQUAL "linux-x86")
+	set(CMAKE_CXX_FLAGS
+		-g
+		-Wall
+		-std=c++11
+		-D_PTHREADS
+		-Wno-unused-parameter
+	)
+ENDIF()
 
 
-set(CMAKE_CXX_COMPILER "g++")
-set(CMAKE_CXX_FLAGS_DEBUG "-O0")
-set(CMAKE_CXX_FLAGS_RELEASE "-O0")
+IF(CMAKE_PLATFORM STREQUAL "win64-vs14")
+    add_definitions(-DWIN32)
+    string (REPLACE "/Zm1000" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    SET (CMAKE_WIN_COMPILE_COMMON_FLAG "/Zi /EHa /bigobj /MP")
+    SET (CMAKE_WIN_COMPILE_DEBUG_FLAG "/Od /D _DEBUG /D DEBUG /RTC1")
+    SET (CMAKE_WIN_COMPILE_RELEASE_FLAG "/O2 /GL /D NDEBUG /FD /Wp64")
+    SET (CMAKE_WIN_COMPILE_STATIC_MT_DLL_DEBUG_FLAG "/MDd")
+    SET (CMAKE_WIN_COMPILE_STATIC_MT_DLL_RELEASE_FLAG "/MD")
+    SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_WIN_COMPILE_COMMON_FLAG} ${CMAKE_WIN_COMPILE_DEBUG_FLAG} ${CMAKE_WIN_COMPILE_STATIC_MT_DLL_DEBUG_FLAG}" CACHE STRING
+        "Flags used by the C++ compiler during Debug builds."
+        FORCE )
+    SET( CMAKE_C_FLAGS_DEBUG "${CMAKE_WIN_COMPILE_COMMON_FLAG} ${CMAKE_WIN_COMPILE_DEBUG_FLAG} ${CMAKE_WIN_COMPILE_STATIC_MT_DLL_DEBUG_FLAG}" CACHE STRING
+        "Flags used by the C compiler during Debug builds."
+        FORCE )
+    SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_WIN_COMPILE_COMMON_FLAG} ${CMAKE_WIN_COMPILE_RELEASE_FLAG} ${CMAKE_WIN_COMPILE_STATIC_MT_DLL_RELEASE_FLAG}" CACHE STRING
+        "Flags used by the C++ compiler during Release builds."
+        FORCE )
+    SET( CMAKE_C_FLAGS_RELEASE "${CMAKE_WIN_COMPILE_COMMON_FLAG} ${CMAKE_WIN_COMPILE_RELEASE_FLAG} ${CMAKE_WIN_COMPILE_STATIC_MT_DLL_RELEASE_FLAG}" CACHE STRING
+        "Flags used by the C compiler during Release builds."
+        FORCE )
+ELSEIF(CMAKE_PLATFORM STREQUAL "linux-x86")
+	set(CMAKE_CXX_COMPILER "g++")
+	set(CMAKE_CXX_FLAGS_DEBUG "-O0")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O0")
+ENDIF()
 
-string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CXX_FLAGS}")
+message(STATUS "CXX_FLAGS=${CMAKE_CXX_FLAGS}")
+message(STATUS "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 
 
-string(TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE)
-message(STATUS "CXX_FLAGS = " ${CMAKE_CXX_FLAGS} " " ${CMAKE_CXX_FLAGS_${BUILD_TYPE}})
-
-add_subdirectory(WebServer)
+add_subdirectory(base)
+add_subdirectory(server)
+add_subdirectory(test)
