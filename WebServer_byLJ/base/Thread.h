@@ -8,13 +8,17 @@
 #include <memory>
 #include <string>
 #include "CountDownLatch.h"
-#include "noncopyable.h"
 
-class Thread : noncopyable {
- public:
+class Thread
+{
+public:
   typedef std::function<void()> ThreadFunc;
   explicit Thread(const ThreadFunc&, const std::string& name = std::string());
   ~Thread();
+  Thread(const Thread&) = delete;
+  Thread& operator=(const Thread&) = delete;
+
+
   void start();
   int join();
   bool started() const { return started_; }
