@@ -1,18 +1,27 @@
 // @Author Lin Ya
 // @Email xxbbb@vip.qq.com
 #pragma once
-#include <pthread.h>
-#include <sys/syscall.h>
-#include <unistd.h>
+
 #include <functional>
 #include <memory>
 #include <string>
-#include "CountDownLatch.h"
+#include <thread>
+#include <memory>
+
+using Tid = std::thread::id;
+
+namespace CurrentThread {
+    inline void sleepForMillisec(int x)
+    {
+        std::this_thread::sleep_for(std::chrono::microseconds(x));
+    }
+}
 
 class Thread
 {
 public:
-  typedef std::function<void()> ThreadFunc;
+  using ThreadFunc = std::function<void()>;
+
   explicit Thread(const ThreadFunc&, const std::string& name = std::string());
   ~Thread();
   Thread(const Thread&) = delete;
@@ -20,18 +29,19 @@ public:
 
 
   void start();
-  int join();
+  void join();
   bool started() const { return started_; }
-  pid_t tid() const { return tid_; }
+  Tid gettid() const { return tid_; }
   const std::string& name() const { return name_; }
 
  private:
   void setDefaultName();
-  bool started_;
-  bool joined_;
-  pthread_t pthreadId_;
-  pid_t tid_;
+
+  std::shared_ptr<std::thread> thread_;
+  bool started_ = false;
+  bool joined_ = false;
+  Tid tid_;
   ThreadFunc func_;
   std::string name_;
-  CountDownLatch latch_;
+
 };
