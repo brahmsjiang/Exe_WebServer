@@ -1,5 +1,5 @@
-// @Author Lin Ya
-// @Email xxbbb@vip.qq.com
+// @Author Jiang Lan
+// @Email brahmsjiang@163.com
 #include "Thread.h"
 
 #include <assert.h>
@@ -12,12 +12,16 @@
 
 using namespace std;
 
-//namespace CurrentThread {
-//    void sleepForMillisec(int x)
-//    {
-//        std::this_thread::sleep_for(std::chrono::microseconds(x));
-//    }
-//}
+namespace CurrentThread {
+    void sleepForMillisec(int x)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(x));
+    }
+    Tid tid()
+    {
+        return std::this_thread::get_id();
+    }
+}
 
 Thread::Thread(const ThreadFunc& func, const string& name)
     : func_(func),

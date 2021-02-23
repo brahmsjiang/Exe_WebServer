@@ -1,9 +1,13 @@
 set(LIB_SRC
     Thread.cpp
+	Logging.cpp
+	LogStream.cpp
 )
 
 set(LIB_HEAD
 	Thread.h
+	Logging.h
+	LogStream.h
 )
 
 IF(CMAKE_PLATFORM STREQUAL "win64-vs14")

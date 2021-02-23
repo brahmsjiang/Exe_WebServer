@@ -11,10 +11,8 @@
 using Tid = std::thread::id;
 
 namespace CurrentThread {
-    inline void sleepForMillisec(int x)
-    {
-        std::this_thread::sleep_for(std::chrono::microseconds(x));
-    }
+    void sleepForMillisec(int x);
+    Tid tid();
 }
 
 class Thread
@@ -26,7 +24,6 @@ public:
   ~Thread();
   Thread(const Thread&) = delete;
   Thread& operator=(const Thread&) = delete;
-
 
   void start();
   void join();
