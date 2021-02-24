@@ -18,7 +18,7 @@ ENDIF()
 
 add_library(libBase ${LIB_HEAD} ${LIB_SRC})
 
-target_link_libraries(libBase pthread rt)
+target_link_libraries(libBase)
 
 set_target_properties(libBase PROPERTIES OUTPUT_NAME "Base")
 

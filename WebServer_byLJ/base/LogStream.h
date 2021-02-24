@@ -46,6 +46,8 @@ class LogStream
 {
 public:
     typedef FixedBuffer<kSmallBuffer> Buffer;
+	LogStream() {}
+	~LogStream() {}
     LogStream(const LogStream&) = delete;
     LogStream& operator=(const LogStream&) = delete;
 

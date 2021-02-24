@@ -1,4 +1,6 @@
 #include "Thread.h"
+#include "Logging.h"
+
 #include <iostream>
 
 
@@ -7,7 +9,7 @@ void threadFuncTest()
     while (true)
     {
         CurrentThread::sleepForMillisec(3000);
-        std::cout << "threadFuncTest" << std::endl;
+        LOG << "threadFuncTest\n";
     }
 }
 

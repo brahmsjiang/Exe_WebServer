@@ -6,15 +6,18 @@
 #include <string>
 #include <memory>
 
+class LogStream;
+
 class Logger
 {
 public:
     Logger(const char* fileName, int line);
     ~Logger();
+	LogStream& stream();
 
 private:
-	class LoggerImpl;
-    std::unique_ptr<LoggerImpl> impl_;
+	class Impl;
+    std::unique_ptr<Impl> impl_;
 };
 
 #define LOG Logger(__FILE__, __LINE__).stream()

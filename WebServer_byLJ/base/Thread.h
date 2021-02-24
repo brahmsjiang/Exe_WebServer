@@ -8,11 +8,9 @@
 #include <thread>
 #include <memory>
 
-using Tid = std::thread::id;
-
 namespace CurrentThread {
     void sleepForMillisec(int x);
-    Tid tid();
+    unsigned tid();
 }
 
 class Thread
@@ -28,7 +26,7 @@ public:
   void start();
   void join();
   bool started() const { return started_; }
-  Tid gettid() const { return tid_; }
+  std::thread::id gettid() const { return tid_; }
   const std::string& name() const { return name_; }
 
  private:
@@ -37,7 +35,7 @@ public:
   std::shared_ptr<std::thread> thread_;
   bool started_ = false;
   bool joined_ = false;
-  Tid tid_;
+  std::thread::id tid_;
   ThreadFunc func_;
   std::string name_;
 

@@ -17,9 +17,11 @@ namespace CurrentThread {
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(x));
     }
-    Tid tid()
+	unsigned tid()
     {
-        return std::this_thread::get_id();
+		std::thread::id tid = std::this_thread::get_id();
+		_Thrd_t* t = (_Thrd_t*)(char*)&tid;
+        return t->_Id;
     }
 }
 
